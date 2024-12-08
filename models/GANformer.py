@@ -63,26 +63,6 @@ class GenerativeFormer(nn.Module):
         self.biomarker_dropout = nn.Dropout(biomarker_dropout)
         self.biomarker_output_layer = nn.Linear(dim_model, self.biomarker_vocab - 1)
 
-        """ test it later
-        self.biomarker_hidden_layer = nn.Linear(dim_model, biomarker_hidden_dim)
-        self.predict_biomarkers_layer = nn.Linear(biomarker_hidden_dim, self.biomarker_vocab - 1)
-        self.dropout = nn.Dropout(biomarker_dropout)
-        self.activation = nn.GELU(approximate='tanh')
-        self.biomarker_output_layer = nn.Sequential(self.biomarker_hidden_layer,
-                                                    #nn.LayerNorm(biomarker_hidden_dim),
-                                                    self.activation,
-                                                    self.dropout,
-                                                    self.predict_biomarkers_layer)
-        """
-
-        # Output layer maps to biomarker vocab sizes
-        """ test it later
-        self.biomarker_output_layers = nn.ModuleDict({
-            f'biomarker_{i}': nn.Linear(biomarker_hidden_dim, vocab_size - 1)  # Exclude start token
-            for i, vocab_size in enumerate(max_bins)
-        })
-        """
-
         if biomarker_mask:
             self.attention_mask = self.generate_biomarker_seq_mask(num_biomarkers + 1, max_seq_length)
         else:
@@ -97,10 +77,6 @@ class GenerativeFormer(nn.Module):
         # Initialize Token Output Layer
         nn.init.zeros_(self.token_output_layer.bias)  # Biases set to zero
         nn.init.xavier_uniform_(self.token_output_layer.weight)  # Xavier Uniform for weights
-
-        # Initialize Biomarker Output Layer
-        #nn.init.zeros_(self.biomarker_hidden_layer.bias)  # Biases set to zero
-        #nn.init.xavier_uniform_(self.biomarker_hidden_layer.weight)  # Xavier Uniform for weights
 
         nn.init.zeros_(self.biomarker_output_layer.bias)  # Biases set to zero
         nn.init.xavier_uniform_(self.biomarker_output_layer.weight)  # Xavier Uniform for weights
